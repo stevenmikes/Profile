@@ -1,0 +1,19 @@
+;; delete alias, speeds up deleting thousands of shapes
+procedure( myDelete(@optional objects)
+    if(objects == nil
+        objects = geGetSelSet()
+    );if
+
+    cond(
+    (objects == nil leHiDelete())
+    (length(objects) < 1000 leHiDelete())
+    (t
+        info("splitting list of length %d\n" length(objects))
+        b = copy(nthcdr(length(objects)/2 objects)) 
+        rplacd(nthcdr(length(objects)/2-1 objects) nil)
+        a = copy(objects)
+        myDelete(a)
+        myDelete(b)
+    )
+    );cond
+)

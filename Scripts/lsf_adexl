@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#lsf_adexl
+#Author: John K. Koehler (koehlerj@us.ibm.com)
+#Date: 04/29/2015
+#Description: script to be used with adexl to submit jobs to lsf using a .lsf_adexl file to control the lsf options
+#To use, create a .lsf_adexl file in the directory you start cadence from and define the following variables:
+LSF_QUEUE=normal
+LSF_PROJECT=SSE
+LSF_GROUP=sse_hss
+LSF_CPUS=1
+LSF_MEMORY=1
+LSF_OS=linux
+
+CONF_FILE=$PWD/.lsf_adexl
+
+if [ ! -r $CONF_FILE ]
+then
+  echo -e "***** lsf_adexl WARNING *****\n$CONF_FILE not found.\nCreating file with default values." | xmessage -file - -timeout 60
+  echo "LSF_QUEUE=$LSF_QUEUE"      > $CONF_FILE
+  echo "LSF_PROJECT=$LSF_PROJECT" >> $CONF_FILE
+  echo "LSF_GROUP=$LSF_GROUP"     >> $CONF_FILE
+  echo "LSF_CPUS=$LSF_CPUS"       >> $CONF_FILE
+  echo "LSF_MEMORY=$LSF_MEMORY"   >> $CONF_FILE
+  echo "LSF_OS=$LSF_OS"           >> $CONF_FILE
+fi
+
+if [ -r $CONF_FILE ]
+then
+  . $CONF_FILE
+else
+  echo -e "***** lsf_adexl WARNING *****\nUnable to read $CONF_FILE." | xmessage -file - -timeout 60
+fi
+
+#/home/lsf/releasedir/bin/bsub -J adexl -P SSE -G sse_hss -q normal -n 2 -M 16 -R "select[osname==linux]" -o /dev/null -e /dev/null $*
+/home/lsf/releasedir/bin/bsub -J adexl -P $LSF_PROJECT -G $LSF_GROUP -q $LSF_QUEUE -n $LSF_CPUS -M $LSF_MEMORY -R "select[osname==$LSF_OS]" -o /dev/null -e /dev/null $*

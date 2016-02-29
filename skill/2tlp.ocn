@@ -1,0 +1,48 @@
+procedure( plotCont(cont Frequency)
+let( (w) 
+    w=newWindow()
+    ;hardCopyOptions(?hcOutputFile sprintf(nil "~/%s_%s.png" cont Frequency)
+    ;                ?hcUseExistingBackground t)
+    awvPlotSimpleExpression(cont ?plotStyle "Append" ?graphType "Impedance" ?graphModifier "Magnitude")
+    _ddtExecuteAction(w~>vivaSession "fitSmith")
+    addTitle( Frequency )
+    addWindowLabel( list(0 0) sprintf(nil "\n\n\n\n\n\n\n\n\n\n\n\n\t\t\tF=%s\n" Frequency) )
+    ;sleep(2)
+    ;hardCopy(w)
+);let
+);procedure
+
+Frequency = "1000M"
+resultsDirBase="/rscratch/holyoke/tsmcN28_03p00/smikes/simulation/tb_pa/spectre/schematic"
+openResults( resultsDirBase )
+selectResults("hb_mt_fi")
+
+PO = ( pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(1 0)) +
+       pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(0 1)) )
+PI = ( pvi('hb "/VI" 0 "/PORT0/PLUS" 0 '(1 0)) +
+       pvi('hb "/VI" 0 "/PORT0/PLUS" 0 '(0 1)) )
+PSUP = -2*pvi('hb "/VDD" 0 "/V0/PLUS" 0 '(0 0))
+PAE = ((100 * (PO - PI)) / PSUP)
+PIM7 = ( pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(-3 4)) +
+         pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(4 -3)) )
+PIM5 = ( pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(-2 3)) +
+         pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(3 -2)) )
+PIM3 = ( pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(-1 2)) +
+         pvi('hb "/VO" 0 "/PORT1/PLUS" 0 '(2 -1)) )
+IMD = dB10(((PIM3 + PIM5 + PIM7) / PO))
+;PO_dBm=dBm(PO)
+
+drGetWaveformYVec(PO)~>expression="PO"
+drGetWaveformYVec(PAE)~>expression="PAE"
+drGetWaveformYVec(IMD)~>expression="IMD"
+;drGetWaveformYVec(PO_dBm)~>expression="PO_dBm"
+
+POcont =awvRfLoadPull( PO  ?maxValue nil ?minValue 60m ?numCont 9 ?closeCont nil)
+PAEcont=awvRfLoadPull( PAE ?maxValue nil ?minValue 25 ?numCont 7 ?closeCont nil)
+IMDcont=awvRfLoadPull( IMD ?maxValue -25 ?minValue nil ?numCont 10 ?closeCont nil)
+;PO_dBmcont =awvRfLoadPull( PO_dBm  ?maxValue nil ?minValue 24 ?numCont 10 ?closeCont nil)
+
+plotCont("POcont" Frequency)
+plotCont("PAEcont" Frequency)
+plotCont("IMDcont" Frequency)
+;plotCont("PO_dBmcont" Frequency)

@@ -1,0 +1,22 @@
+(procedure updateCDFTermOrder(libName)
+(let (cellsList cv texts)
+cellsList = ddGetObj(libName)~>cells
+foreach(cell cellsList
+    if( ddGetObj(libName, cell~>name, "symbol") && ddGetObj(libName, cell~>name, "schematic") then
+        schemWin=ddsServOpen(libName, cell~>name, "schematic", "edit", nil)
+        schHiCheckAndSave()
+        schHiViewToView()
+        cv = geGetEditCellView()
+        if(cv~>cellViewType == "symbol" then
+            texts = setof(x cv~>shapes x~>layerName=="text")
+            foreach(text texts
+                dbDeleteObject(text)
+            );foreach
+            schHiVICAndSave()
+            leCloseWindow()
+        );if
+        leCloseWindow()
+    ); if
+);foreach
+);let
+);procedure

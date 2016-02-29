@@ -1,0 +1,15 @@
+# Ignore Everything...
+/*
+/*/
+
+# ...Exept for these files
+!.gitignore
+!.vimrc
+!.bashrc
+!.spectremdlrc
+!.Xresources
+
+# ...And these directories
+!/.vim/
+!/skill/
+!/Scripts/

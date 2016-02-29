@@ -1,0 +1,12 @@
+#!/bin/sh
+# prepares netlist
+# must have symbolic link named 'netlist'
+
+[ -h netlist ] || { echo "error: 'netlist' link not present"; exit 1; }
+cp netlist input.scs
+#sed -i 's/currents=[a-z]*/currents=selected/' input.scs
+#sed -i 's/reltol=1e-[0-9]/reltol=1e-5/' input.scs
+sed -i 's/cols=80/cols=100/' input.scs
+sed -i 's/save=.*/save=selected/' input.scs
+
+[ -f sims.scs ] && cat sims.scs >> input.scs

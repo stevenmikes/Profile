@@ -1,0 +1,67 @@
+auCore.misc updateCDFtermOrder boolean t
+
+; Simulator Customizations
+; --------------------------
+asimenv saveAsCellview  boolean t
+spectre.tranOpts flushtime string "60"
+asimenv.window	width	int	800
+asimenv.window	x	int	1
+asimenv.window	height	int	400
+asimenv.window	y	int	1
+
+; Layout Customizations
+; --------------------------
+;layout  xSnapSpacing  float  0.005
+;layout  ySnapSpacing  float  0.005
+layout  keepWiresConnectedToNonWires  boolean nil
+layout	createPinLabel	boolean	t
+layout	displayPinNames	boolean	t
+layout	displayRefPoint	boolean	t
+layout	autoSetRefPoint	boolean	t
+layout autoTap boolean nil
+layoutXL constraintAwareEditing boolean nil
+layoutXL autoArrange boolean nil
+layoutXL mfactorSplit boolean nil
+
+; Schematic Customizations
+; --------------------------
+schematic   srcSolderOnCrossover  cyclic  "ignored"
+;schematic tsgTemplateType string "other"
+
+; CW Customizations
+; -------------------
+ui ciwCmdInputLines int 6
+
+; VIVA Customizations
+; --------------------------
+wavescan.application VIVA_UseNextLicense string "always"
+viva.circGraph plotToSmithView string "true"
+viva.graphFrame width string "1200"
+viva.graphFrame height string "900"
+viva.trace lineThickness string "thin"
+viva.axis  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.circleMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.graphLabel  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.horizMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.interceptMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.multiDeltaMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.pointMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.polarGrid  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.probe  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.refPointMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.referenceLineMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.smithGrid  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.specMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.transEdgeMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+viva.vertMarker  font  string  "Charter,11,-1,5,50,0,0,0,0,0"
+
+; License Management
+; ---------------------------
+license VSELicenseCheckoutOrder string "L,XL"
+license ADELicenseCheckoutOrder string "L,XL,GXL"
+license VLSLicenseCheckoutOrder string "L,XL,GXL"
+license VSEL_UseNextLicense     string "always"
+license ADEL_UseNextLicense     string "always"
+license ADEXL_UseNextLicense    string "always"
+license VLSL_UseNextLicense     string "always"
+license VLSXL_UseNextLicense    string "always"

@@ -1,0 +1,10 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_1='/afs/awd.austin.ibm.com/proj/p9/eclipz/c14/usr/smikes1/c05/mdl/hsscdr_rx_sp/peakswp'
+let g:netrw_dirhist_2='/afs/awd.austin.ibm.com/proj/p9/eclipz/c14/usr/smikes1/c05/mdl/hsscdr_rx_sp/gainswp.raw'
+let g:netrw_dirhist_3='/afs/btv.ibm.com/u10/mpbeakes/bing/reflibs'
+let g:netrw_dirhist_4='/afs/awd.austin.ibm.com/proj/p9/eclipz/c14/usr/smikes1/c06/mdl/rx/ext_c/gainswp/..'
+let g:netrw_dirhist_5='/afs/awd.austin.ibm.com/proj/p9/eclipz/common/spool/History'
+let g:netrw_dirhist_6='/afs/awd.austin.ibm.com/proj/p9/eclipz/c14/usr/smikes1/c06/mdl/rx/ext_c/vgalin.raw'
+let g:netrw_dirhist_7='/afs/awd.austin.ibm.com/proj/p9/eclipz/c14/tools/cte/ibmtech/common14hp/6.4/morastp4/spectre/14hp_v0040_r1_rcr_mxc4hxvn2_spe.BEOL2/corners/analog_fc_pz'
+let g:netrw_dirhist_8='/afs/awd.austin.ibm.com/proj/p9/eclipz/c14/usr/smikes1/c06/mdl/afe_vrefcm'

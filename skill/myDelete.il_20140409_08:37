@@ -1,0 +1,13 @@
+;; delete alias, speeds up deleting thousands of shapes
+procedure( myDelete()
+    objects = geGetSelSet()
+
+    cond(
+    (objects == nil leHiDelete())
+    (length(objects) < 1000 leHiDelete())
+    (t  foreach( obj objects
+            dbDeleteObject(obj)
+        );foreach
+    )
+    );cond
+)

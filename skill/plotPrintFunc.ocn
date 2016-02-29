@@ -1,0 +1,175 @@
+(procedure printOutputList(outputList fp)
+(let (names)
+    foreach(val car(outputList)->?
+        fprintf(fp "%s\t" val)
+    );foreach
+    fprintf(fp "\n")
+    foreach(sweepPoint reverse(outputList)
+        names = sweepPoint->?
+        foreach(val names
+            fprintf(fp "%g\t" (get sweepPoint val)) 
+        );foreach
+        fprintf(fp "\n")
+    ) ;foreach
+);let
+);procedure
+
+; outputList = list( list(name, output) list(name, output)...)
+(procedure printSweepValues(outputList fp)
+(let (mySweepNames mySweepVals)
+    mySweepNames = (setof x sweepNames() (x != "freq" && x != "time"))
+    mySweepVals = (mapcar 'sweepVarValues mySweepNames)
+    (mapcar (lambda (x) (fprintf fp "%s\t" x)) (append mySweepNames (mapcar 'car outputList)))
+    (fprintf fp "\n")
+    (_printSweepValues (mapcar 'cadr outputList) mySweepVals fp nil)
+);let
+);procedure
+
+(procedure _printSweepValues(outputList sweepVals fp valList)
+(let (rlist)
+    (if (cdr sweepVals) == nil then
+        (foreach sweepVal (car sweepVals)
+            (foreach val (reverse valList)
+                (fprintf fp "%g\t" val)
+            );foreach
+            (fprintf fp "%g\t" sweepVal)
+            (foreach output outputList
+                (fprintf fp "%g\t" (value output (famGetSweepName output) sweepVal))
+            );foreach
+            (fprintf fp "\n")
+        );foreach
+    else
+        (foreach point (car sweepVals)
+            rlist = (mapcar (lambda (x) (value x (famGetSweepName x) point)) outputList)
+            (_printSweepValues rlist (cdr sweepVals) fp (cons point valList))
+        );foreach
+    );if
+);let
+);procedure 
+
+
+(procedure getWaveFromFamily(family)
+(let (sval)
+    (if drIsWaveform(family) then
+        family
+    else
+        sval = car(famGetSweepValues(family))
+        getWaveFromFamily(famValue(family sval))
+    )
+);let
+);procedure
+
+; path        -- directory with raw results from sweep
+; outputExprs -- list of (name, expr function) list pairs. Example list( list("A" lamba(x) vtime('tran x)))
+; resultType -- symbol for sim type. Example: 'tran
+; RETURNS list of family plots, 1 per requested output
+(procedure gatherOutputs(path outputExprs resultType)
+(let (dirnames rawdirs outputTable mySweepNames)
+    dirnames = setof(x getDirFiles(path) rexMatchp("\\.raw" x))
+    rawdirs = mapcar(lambda((x) strcat(path x)) dirnames)
+    outputTable = (makeTable "Output Table" nil)
+    foreach( rawdir rawdirs
+        (if openResults(rawdir) then
+            selectResults(resultType)
+            mySweepNames = (setof x sweepNames() (x != "freq" && x != "time"))
+            key = (mapcar (lambda (x) (car sweepVarValues(x))) mySweepNames)
+            outputTable[key] = (mapcar (lambda (x) (getWaveFromFamily (apply (cdr x) (list (car x))))) outputExprs)
+        );if
+
+        closeResults(rawdir)
+        rdbUnloadResults( "unbound" list(rawdir))
+    );foreach
+    regroupFamilies(outputTable mySweepNames)
+);let
+);procedure
+
+; outputTable -- table with key=list(swpval1 swpval2 ...), data=list(waveform1 waveform2 ...)
+; mySweepNames  -- list(swpname1 swpname2 ...)
+; RETURNS list of family plots, 1 per requested output
+(procedure regroupFamilies(outputTable mySweepNames)
+(let (sweepValLists retfams)
+    ;Generate lists of unique sweep values
+    sweepValLists = nil
+    (for i 0 (length (car outputTable->?))-1
+       sweepValLists = (cons (uniquify (mapcar (lambda (x) (nth i x)) outputTable->?)) sweepValLists) 
+    );for
+    sweepValLists = (reverse sweepValLists)
+
+    retfams = (mapcar (lambda (x) (famCreateFamily (car mySweepNames) 'double)) outputTable[(car outputTable->?)])
+    (foreach val (car sweepValLists)
+        subfams = (_regroupFamily outputTable (cdr mySweepNames) (cdr sweepValLists) (ncons val))
+        print(subfams)
+        printf("\n")
+        (mapcar (lambda (retfam subfam) (famAddValue retfam val subfam)) retfams subfams)
+    );foreach
+    retfams
+);let
+);pocedure
+
+
+; Recursive Helper Function
+(procedure _regroupFamily(outputTable mySweepNames sweepValLists sweepPointList)
+(let (retfams key)
+    retfams = (mapcar (lambda (x) (famCreateFamily (car mySweepNames) 'double)) outputTable[(car outputTable->?)])
+
+    ;Leaf node, add waveforms
+    (if (cdr mySweepNames) == nil then
+        (foreach val (car sweepValLists)
+            key = (reverse (cons val sweepPointList))
+            (mapcar (lambda (retfam wave) (famAddValue retfam val wave)) retfams outputTable[key])
+        );foreach
+    ;Middle node, get down
+    else
+        printf("middle node\n")
+        (foreach val (car sweepValLists)
+            subfams =  (_regroupFamily outputTable (cdr mySweepNames) (cdr sweepValLists) (cons val sweepPointList))
+            (mapcar (lambda (retfam subfam) (famAddValue retfam val subfam)) retfams subfams)
+        );foreach
+    );if
+    retfams
+);let
+);procedure
+
+procedure(uniquify(L)
+let(((hash makeTable("uniqueList" nil)) (q L) (p cdr(L)))
+    hash[car(L)] = t
+    while(p
+      if(hash[car(p)] then
+          p = cdr(p)
+          setcdr(q p)
+      else
+          hash[car(p)] = t
+          q = p
+          p = cdr(p)
+      ); if
+    ); while
+    L
+); let
+); procedure
+;; this does not change the sort order of the list and is of order N, 
+;; it uses local variables and a hash table for storage
+
+
+procedure(cinfo(cnum)
+let( (infostring)
+    case(cnum
+        ( 0 infostring = "cor=tt_RC=tt_T=085_Vio=0.980")
+        ( 1 infostring = "cor=ff_RC=wc_T=105_Vio=0.950")
+        ( 2 infostring = "cor=ff_RC=wc_T=105_Vio=1.155")
+        ( 3 infostring = "cor=ff_RC=wc_T=-10_Vio=0.950")
+        ( 4 infostring = "cor=ff_RC=wc_T=-10_Vio=1.155")
+        ( 5 infostring = "cor=ff_RC=bc_T=105_Vio=0.950")
+        ( 6 infostring = "cor=ff_RC=bc_T=105_Vio=1.155")
+        ( 7 infostring = "cor=ff_RC=bc_T=-10_Vio=0.950")
+        ( 8 infostring = "cor=ff_RC=bc_T=-10_Vio=1.155")
+        ( 9 infostring = "cor=ss_RC=wc_T=105_Vio=0.950")
+        (10 infostring = "cor=ss_RC=wc_T=105_Vio=1.155")
+        (11 infostring = "cor=ss_RC=wc_T=-10_Vio=0.950")
+        (12 infostring = "cor=ss_RC=wc_T=-10_Vio=1.155")
+        (13 infostring = "cor=ss_RC=bc_T=105_Vio=0.950")
+        (14 infostring = "cor=ss_RC=bc_T=105_Vio=1.155")
+        (15 infostring = "cor=ss_RC=bc_T=-10_Vio=0.950")
+        (16 infostring = "cor=ss_RC=bc_T=-10_Vio=1.155")
+    )
+) ;let
+) ;precedure

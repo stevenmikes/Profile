@@ -1,0 +1,54 @@
+openResults("/projects/flume/ibm_csoi7rf_03p00/work/smikes/simulation/tb_io/spectre/schematic")
+stoptime = pv("top-level", "stoptime", ?result "designParamVals")
+period = 1.0/pv("top-level", "fclock", ?result "designParamVals")
+
+printf("MOSI\n")
+mosi = vtime("tran" "/mosi" nil)
+mosi_samples = sample(mosi, period/2, stoptime, "linear", period)
+samples_vector = drGetWaveformYVec(mosi_samples)
+length = drVectorLength(samples_vector)
+for( i 0 length-1
+    modi = mod(i 46)
+    if( modi==3 || modi==43 then
+        printf("    ")
+    )
+    if( modi==10 || modi==17 || modi == 18 then
+        printf(" ")
+    )
+    if( drGetElem(samples_vector i)>0.6 then
+        dig = 1
+    else
+        dig = 0
+    )
+    printf("%d" dig)
+    if( modi==45 then
+        printf("\n")
+    )
+)
+
+printf("\n")
+printf("\n")
+
+printf("MISO\n")
+miso = vtime("tran" "/miso" nil)
+miso_samples = sample(miso, 1.5*period, stoptime, "linear", period)
+samples_vector = drGetWaveformYVec(miso_samples)
+length = drVectorLength(samples_vector)
+for( i 0 length-1
+    modi = mod(i 46)
+    if( modi==3 || modi==43 then
+        printf("    ")
+    )
+    if( modi==10 || modi==11 || modi==36 then
+        printf(" ")
+    )
+    if( drGetElem(samples_vector i)>0.9 then
+        dig = 1
+    else
+        dig = 0
+    )
+    printf("%d" dig)
+    if( modi==45 then
+        printf("\n")
+    )
+)
